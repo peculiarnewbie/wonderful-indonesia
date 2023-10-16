@@ -1,9 +1,5 @@
 <script lang="ts">
 	import { T, useFrame } from '@threlte/core';
-	import { ContactShadows, Float, Grid, OrbitControls } from '@threlte/extras';
-	import { interactivity } from '@threlte/extras';
-	import { spring, tweened, type Spring } from 'svelte/motion';
-	import { randFloat } from 'three/src/math/MathUtils.js';
 
 	export let blocks: { x: number; y: number; h: number }[] = [];
 </script>

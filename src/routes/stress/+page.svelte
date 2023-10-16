@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Canvas } from '@threlte/core';
 	import Scene from './Scene.svelte';
-	import App from '$lib/components/App.svelte';
 	import '../../app.css';
 	import { randFloat } from 'three/src/math/MathUtils.js';
 	import { onMount } from 'svelte';

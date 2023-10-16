@@ -36,5 +36,9 @@
     "typescript": "^5.0.0",
     "vite": "^4.4.2"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@types/node": "^20.8.6",
+    "geotiff": "^2.0.7"
+  }
 }
