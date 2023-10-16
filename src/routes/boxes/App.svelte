@@ -7,7 +7,7 @@
 
 <div class="p-4 absolute">
 	<div class="p-2 gap-2 flex flex-col bg-neutral-500 rounded-md">
-		<div class="w-4 p-2">alooo</div>
+		<div class="w-fit p-2">try hovering on the boxes</div>
 		<button
 			class="w-fit p-2 bg-white rounded-md"
 			on:click={() => {
