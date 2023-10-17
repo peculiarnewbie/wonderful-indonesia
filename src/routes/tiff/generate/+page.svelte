@@ -12,6 +12,9 @@
 	let res = 100;
 
 	let blocks: { x: number; y: number; h: number }[] = [];
+	let perimeter: { x: number; y: number; h: number }[] = [];
+
+	let plot: string[];
 
 	const postContent = async () => {
 		let data = new FormData();
@@ -22,73 +25,77 @@
 			body: data
 		});
 		const res = await response.json();
-		console.log(res);
+		// console.log(res);
 
-		rebuild(res.jsonData, 50);
-		// rebuildFromCompressed(res.jsonData);
+		// rebuild(res.jsonData, 50);
+		plot = res.jsonData;
+		rebuildFromCompressed();
 
-		triggerDownload(res.jsonData);
+		// triggerDownload(res.jsonData);
 	};
 
-	const rebuildFromCompressed = (plot: string[]) => {
-		let resolution = 1000;
+	const rebuildFromCompressed = () => {
+		let picRes = 1000;
 		let x: number = 0;
 		let y: number = 0;
 		// let currentToken = 'n';
 		let temp: { x: number; y: number; h: number }[] = [];
 
-		let heightData: number[][] = new Array(resolution);
+		let heightData: number[][] = new Array(picRes);
 
 		for (let i = 0; i < heightData.length; i++) {
-			heightData[i] = new Array(resolution); // Initialize the inner arrays with size 100
+			heightData[i] = new Array(picRes); // Initialize the inner arrays with size 100
 		}
 
-		const advance = (plot: string) => {
-			let coord = Number(plot.substring(1));
-			x += Math.floor(coord / resolution);
-			y += coord % resolution;
-			if (y > resolution) {
-				x += Math.floor(y / resolution);
-				y = coord % resolution;
+		const next = () => {
+			y++;
+			if (y == 1000) {
+				y = 0;
+				x++;
 			}
 		};
 
-		const fillLand = (plot: string, isZero: boolean) => {
-			let coord = Number(plot.substring(1));
-			const next = () => {
-				y++;
-				if (y == 1000) {
-					y = 0;
-					x++;
-				}
-			};
-			if (isZero) {
-				for (let i = 0; i < coord; i++) {
-					temp.push({ x: x, y: y, h: 0 });
-					next();
-				}
-			} else {
-				temp.push({ x: x, y: y, h: coord });
+		const advance = (length: number) => {
+			// console.log('============== advance: ', length);
+			for (let i = 0; i < length; i++) {
+				heightData[x][y] = -200;
 				next();
 			}
 		};
 
+		const fillLand = (length: number) => {
+			// console.log('============== fill Land: ', length);
+			for (let i = 0; i < length; i++) {
+				heightData[x][y] = 0;
+				next();
+			}
+		};
+
+		const fillArea = (height: number) => {
+			// console.log('============== advance', length);
+			heightData[x][y] = height;
+			next();
+		};
+
 		plot.forEach((plot) => {
 			if (plot[0] == 's') {
-				advance(plot);
+				const coord = Number(plot.substring(1));
+				advance(coord);
 			} else if (plot[0] == 'l') {
-				fillLand(plot, true);
+				const coord = Number(plot.substring(1));
+				fillLand(coord);
 			} else {
-				fillLand(plot, false);
+				fillArea(Number(plot));
 			}
 		});
 
-		console.log(temp);
+		// console.log(heightData);
 
-		blocks = temp;
+		rebuild(heightData, res);
 	};
 
 	const rebuild = (heightData: number[][], resolution: number) => {
+		res = resolution;
 		let currentPlot: { x: number; y: number; h: number }[] = [];
 		const rev = 1000 / resolution;
 
@@ -126,10 +133,26 @@
 			return currentPlot;
 		};
 
+		const buildPerimeter = () => {
+			let temp: { x: number; y: number; h: number }[] = [];
+			for (let i = 0; i < 4; i++) {
+				for (let j = 0; j < res + 1; j++) {
+					if (i == 0) temp.push({ x: j, y: -1, h: 1 });
+					else if (i == 1) temp.push({ x: j, y: res, h: 1 });
+					else if (i == 2) temp.push({ x: -1, y: j, h: 1 });
+					else temp.push({ x: res + 1, y: j, h: 1 });
+				}
+			}
+			console.log(temp);
+			return temp;
+		};
+
+		const per = buildPerimeter();
 		const plot1 = plotToResolution(0, 0);
 
 		blocks = [...plot1];
-		res = resolution;
+		perimeter = [...per];
+		// console.log(blocks);
 	};
 </script>
 
@@ -143,9 +166,56 @@
 					<button type="submit">Upload</button>
 				</form>
 			</div>
+			<div class="flex gap-2">
+				<button
+					class="p-2 bg-slate-200 rounded-md w-12"
+					on:click={() => {
+						res = 50;
+						rebuildFromCompressed();
+					}}
+				>
+					50
+				</button>
+				<button
+					class="p-2 bg-slate-200 rounded-md w-12"
+					on:click={() => {
+						res = 100;
+						rebuildFromCompressed();
+					}}
+				>
+					100
+				</button>
+				<button
+					class="p-2 bg-slate-200 rounded-md w-12"
+					on:click={() => {
+						res = 200;
+						rebuildFromCompressed();
+					}}
+				>
+					200
+				</button>
+				<button
+					class="p-2 bg-slate-200 rounded-md w-12"
+					on:click={() => {
+						res = 500;
+						rebuildFromCompressed();
+					}}
+				>
+					500
+				</button>
+				<button
+					class="p-2 bg-slate-200 rounded-md w-12"
+					on:click={() => {
+						res = 1000;
+						rebuildFromCompressed();
+					}}
+				>
+					1000
+				</button>
+			</div>
 		</div>
 	</div>
 	<Canvas>
-		<BlocksScene {blocks} />
+		<BlocksScene {blocks} {res} {perimeter} />
 	</Canvas>
 </div>

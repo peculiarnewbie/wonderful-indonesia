@@ -43,7 +43,7 @@ export async function convertTIFF(buffer: Buffer) {
 		const { width, [0]: raster } = rasters;
 		let compressed: string[] = [];
 
-		let token = '';
+		let token = 'n';
 		let count = 0;
 
 		for (let i = 0; i < resolution; i++) {
@@ -58,7 +58,7 @@ export async function convertTIFF(buffer: Buffer) {
 							compressed.push(string);
 						}
 						token = 's';
-						count = 0;
+						count = 1;
 					} else {
 						count++;
 					}
@@ -69,7 +69,7 @@ export async function convertTIFF(buffer: Buffer) {
 							compressed.push(string);
 						}
 						token = 'l';
-						count = 0;
+						count = 1;
 					} else {
 						count++;
 					}
