@@ -12,7 +12,6 @@
 	let res = 100;
 
 	let blocks: { x: number; y: number; h: number }[] = [];
-	let perimeter: { x: number; y: number; h: number }[] = [];
 
 	let plot: string[];
 
@@ -132,26 +131,9 @@
 
 			return currentPlot;
 		};
-
-		const buildPerimeter = () => {
-			let temp: { x: number; y: number; h: number }[] = [];
-			for (let i = 0; i < 4; i++) {
-				for (let j = 0; j < res + 1; j++) {
-					if (i == 0) temp.push({ x: j, y: -1, h: 1 });
-					else if (i == 1) temp.push({ x: j, y: res, h: 1 });
-					else if (i == 2) temp.push({ x: -1, y: j, h: 1 });
-					else temp.push({ x: res + 1, y: j, h: 1 });
-				}
-			}
-			console.log(temp);
-			return temp;
-		};
-
-		const per = buildPerimeter();
 		const plot1 = plotToResolution(0, 0);
 
 		blocks = [...plot1];
-		perimeter = [...per];
 		// console.log(blocks);
 	};
 </script>
@@ -216,6 +198,6 @@
 		</div>
 	</div>
 	<Canvas>
-		<BlocksScene {blocks} {res} {perimeter} />
+		<BlocksScene {blocks} {res} />
 	</Canvas>
 </div>
