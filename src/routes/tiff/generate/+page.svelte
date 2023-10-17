@@ -3,6 +3,7 @@
 	import BlocksScene from '$lib/components/BlocksScene.svelte';
 	import '../../../app.css';
 	import { onMount } from 'svelte';
+	import triggerDownload from '$lib/components/download';
 
 	export let data;
 
@@ -24,6 +25,67 @@
 		console.log(res);
 
 		rebuild(res.jsonData, 50);
+		// rebuildFromCompressed(res.jsonData);
+
+		triggerDownload(res.jsonData);
+	};
+
+	const rebuildFromCompressed = (plot: string[]) => {
+		let resolution = 1000;
+		let x: number = 0;
+		let y: number = 0;
+		// let currentToken = 'n';
+		let temp: { x: number; y: number; h: number }[] = [];
+
+		let heightData: number[][] = new Array(resolution);
+
+		for (let i = 0; i < heightData.length; i++) {
+			heightData[i] = new Array(resolution); // Initialize the inner arrays with size 100
+		}
+
+		const advance = (plot: string) => {
+			let coord = Number(plot.substring(1));
+			x += Math.floor(coord / resolution);
+			y += coord % resolution;
+			if (y > resolution) {
+				x += Math.floor(y / resolution);
+				y = coord % resolution;
+			}
+		};
+
+		const fillLand = (plot: string, isZero: boolean) => {
+			let coord = Number(plot.substring(1));
+			const next = () => {
+				y++;
+				if (y == 1000) {
+					y = 0;
+					x++;
+				}
+			};
+			if (isZero) {
+				for (let i = 0; i < coord; i++) {
+					temp.push({ x: x, y: y, h: 0 });
+					next();
+				}
+			} else {
+				temp.push({ x: x, y: y, h: coord });
+				next();
+			}
+		};
+
+		plot.forEach((plot) => {
+			if (plot[0] == 's') {
+				advance(plot);
+			} else if (plot[0] == 'l') {
+				fillLand(plot, true);
+			} else {
+				fillLand(plot, false);
+			}
+		});
+
+		console.log(temp);
+
+		blocks = temp;
 	};
 
 	const rebuild = (heightData: number[][], resolution: number) => {

@@ -39,6 +39,54 @@ export async function convertTIFF(buffer: Buffer) {
 
 	const rasters = await generateRaster(image);
 
+	const compressRaster = () => {
+		const { width, [0]: raster } = rasters;
+		let compressed: string[] = [];
+
+		let token = '';
+		let count = 0;
+
+		for (let i = 0; i < resolution; i++) {
+			for (let j = 0; j < resolution; j++) {
+				//@ts-ignore
+				let height = raster[i + j * width] as number;
+				height = Math.floor(height);
+				if (height < 0) {
+					if (token != 's') {
+						if (token == 'l') {
+							let string = token + count.toString();
+							compressed.push(string);
+						}
+						token = 's';
+						count = 0;
+					} else {
+						count++;
+					}
+				} else if (height == 0) {
+					if (token != 'l') {
+						if (token == 's') {
+							let string = token + count.toString();
+							compressed.push(string);
+						}
+						token = 'l';
+						count = 0;
+					} else {
+						count++;
+					}
+				} else {
+					if (token != 'n') {
+						let string = token + count.toString();
+						compressed.push(string);
+						token = 'n';
+						count = 0;
+					}
+					compressed.push(height.toString());
+				}
+			}
+		}
+		return compressed;
+	};
+
 	const plotHeight = (xOffset: number, yOffset: number) => {
 		const { width, [0]: raster } = rasters;
 
@@ -56,27 +104,11 @@ export async function convertTIFF(buffer: Buffer) {
 		console.log('height read');
 	};
 
-	plotHeight(0, 0);
+	// plotHeight(0, 0);
+	// return heightData;
 
-	// for (let i = 0; i < resolution; i++) {
-	// 	let hasValue = false;
-	// 	let anotha = {};
-	// 	for (let j = 0; j < resolution; j++) {
-	// 		let height = Math.floor(heightData[i][j]);
-	// 		if (!height) continue;
-	// 		if (height >= 0) {
-	// 			hasValue = true;
-	// 			//@ts-ignore
-	// 			anotha[`${j}`] = height;
-	// 		}
-	// 	}
-	// 	if (hasValue) {
-	// 		//@ts-ignore
-	// 		compressed[`${i}`] = anotha;
-	// 	}
-	// }
-
-	return heightData;
+	const compressed = compressRaster();
+	return compressed;
 }
 
 export async function generateRasterFromBuffer(buffer: Buffer) {
