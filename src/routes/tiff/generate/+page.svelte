@@ -30,7 +30,7 @@
 		plot = res.jsonData;
 		rebuildFromCompressed();
 
-		// triggerDownload(res.jsonData);
+		triggerDownload(res.jsonData);
 	};
 
 	const rebuildFromCompressed = () => {

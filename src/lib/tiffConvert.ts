@@ -87,26 +87,6 @@ export async function convertTIFF(buffer: Buffer) {
 		return compressed;
 	};
 
-	const plotHeight = (xOffset: number, yOffset: number) => {
-		const { width, [0]: raster } = rasters;
-
-		console.log('reading height', xOffset, yOffset);
-
-		for (let i = 0; i < 1000; i++) {
-			for (let j = 0; j < 1000; j++) {
-				//@ts-ignore
-				heightData[i + xOffset * 10][j - 1 + yOffset * 10] = raster[i + j * width] as number;
-			}
-		}
-
-		// console.log(compressed);
-
-		console.log('height read');
-	};
-
-	// plotHeight(0, 0);
-	// return heightData;
-
 	const compressed = compressRaster();
 	return compressed;
 }
