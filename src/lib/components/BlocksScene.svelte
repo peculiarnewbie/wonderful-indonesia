@@ -16,7 +16,7 @@
 	];
 </script>
 
-+<T.PerspectiveCamera
+<T.PerspectiveCamera
 	makeDefault
 	position={camera.position}
 	on:create={({ ref }) => {

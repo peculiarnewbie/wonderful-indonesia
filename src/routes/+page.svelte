@@ -4,10 +4,10 @@
 	import { Canvas } from '@threlte/core';
 	import { rebuildFromCompressed } from '$lib/mapBuilder';
 	import '../app.css';
-	import plot1 from '../lib/components/plots/1.json';
-	import plot2 from '../lib/components/plots/2.json';
-	import plot3 from '../lib/components/plots/3.json';
-	import plot4 from '../lib/components/plots/4.json';
+	import plot1 from '../lib/components/plots/plot1.json';
+	import plot2 from '../lib/components/plots/plot2.json';
+	import plot3 from '../lib/components/plots/plot3.json';
+	import plot4 from '../lib/components/plots/plot4.json';
 
 	import { onMount } from 'svelte';
 

@@ -3,7 +3,7 @@
 	import BlocksScene from '$lib/components/BlocksScene.svelte';
 	import '../../../app.css';
 	import { onMount } from 'svelte';
-	import triggerDownload from '$lib/components/download';
+	import triggerDownload from '$lib/download';
 
 	export let data;
 

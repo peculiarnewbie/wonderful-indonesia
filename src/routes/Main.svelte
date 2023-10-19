@@ -17,21 +17,21 @@
 
 	const defaultH = 10;
 	let provinces = [
-		{ name: 'Aceh', h: defaultH },
-		{ name: 'Medan', h: defaultH },
-		{ name: 'Sumbar', h: defaultH },
-		{ name: 'Bengkulu', h: defaultH },
-		{ name: 'Riau', h: defaultH },
-		{ name: 'Jambi', h: defaultH },
-		{ name: 'Lampung', h: defaultH },
-		{ name: 'Sumsel', h: defaultH },
-		{ name: 'Babel', h: defaultH },
-		{ name: 'Kepri', h: defaultH }
+		{ name: 'Aceh', h: defaultH, mat: 'hotpink' },
+		{ name: 'Medan', h: defaultH, mat: 'green' },
+		{ name: 'Sumbar', h: defaultH, mat: 'hotpink' },
+		{ name: 'Bengkulu', h: defaultH, mat: 'hotpink' },
+		{ name: 'Riau', h: defaultH, mat: 'hotpink' },
+		{ name: 'Jambi', h: defaultH, mat: 'hotpink' },
+		{ name: 'Lampung', h: defaultH, mat: 'blue' },
+		{ name: 'Sumsel', h: defaultH, mat: 'hotpink' },
+		{ name: 'Babel', h: defaultH, mat: 'hotpink' },
+		{ name: 'Kepri', h: defaultH, mat: 'hotpink' }
 	];
 
 	export let blocks: { x: number; y: number; h: number }[] = [];
 
-	let camera = { position: [10, 100, 300], look: [100, 100, 0] };
+	let camera = { position: [120, 120, 50], look: [150, 120, 0] };
 
 	let perimeter = [
 		{ x: 99, y: -1, lx: 204, ly: 1 },
@@ -82,7 +82,7 @@
 				scale={352}
 				scale.y={province.h}
 			>
-				<T.MeshStandardMaterial color="hotpink" />
+				<T.MeshStandardMaterial color={province.mat} />
 			</T.Mesh>
 		{/each}
 	{:catch error}
