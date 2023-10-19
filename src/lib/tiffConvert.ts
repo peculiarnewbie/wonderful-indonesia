@@ -6,6 +6,8 @@ import GeoTIFF, {
 	GeoTIFFImage
 } from 'geotiff';
 
+import mask from '../lib/components/masks/Mask4.json';
+
 const lerp = (a: number, b: number, t: number) => (1 - t) * a + t * b;
 
 function transform(a: number, b: number, M: number[], roundToInt = false) {
@@ -45,12 +47,36 @@ export async function convertTIFF(buffer: Buffer) {
 
 		let token = 'n';
 		let count = 0;
+		let transformedMask: boolean[][] = new Array(1000);
+		for (let i = 0; i < 1000; i++) {
+			transformedMask[i] = new Array(1000); // Initialize the inner arrays with size 100
+		}
+
+		let maskPointer = 0;
+		let maskCount = mask[0];
+		let maskState = false;
+
+		for (let i = 0; i < 1000; i++) {
+			for (let j = 0; j < 1000; j++) {
+				transformedMask[j][i] = maskState;
+				if (maskCount < i * 1000 + j) {
+					maskPointer++;
+					maskCount += mask[maskPointer];
+					maskState = !maskState;
+				}
+			}
+		}
 
 		for (let i = 0; i < resolution; i++) {
 			for (let j = 0; j < resolution; j++) {
 				//@ts-ignore
-				let height = raster[i + j * width] as number;
-				height = Math.floor(height);
+				let height: number;
+
+				if (!transformedMask[i][j]) height = -200;
+				else {
+					height = raster[i + j * width] as number;
+					height = Math.floor(height);
+				}
 				if (height < 0) {
 					if (token != 's') {
 						if (token == 'l') {
@@ -84,6 +110,9 @@ export async function convertTIFF(buffer: Buffer) {
 				}
 			}
 		}
+
+		console.log('===================maskCount', maskCount);
+		console.log(maskPointer, mask.length);
 		return compressed;
 	};
 
