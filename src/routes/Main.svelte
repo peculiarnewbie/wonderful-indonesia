@@ -15,23 +15,16 @@
 
 	export let res: number = 100;
 
-	const defaultH = 10;
-	let provinces = [
-		{ name: 'Aceh', h: defaultH, mat: 'hotpink' },
-		{ name: 'Medan', h: defaultH, mat: 'green' },
-		{ name: 'Sumbar', h: defaultH, mat: 'hotpink' },
-		{ name: 'Bengkulu', h: defaultH, mat: 'hotpink' },
-		{ name: 'Riau', h: defaultH, mat: 'hotpink' },
-		{ name: 'Jambi', h: defaultH, mat: 'hotpink' },
-		{ name: 'Lampung', h: defaultH, mat: 'blue' },
-		{ name: 'Sumsel', h: defaultH, mat: 'hotpink' },
-		{ name: 'Babel', h: defaultH, mat: 'hotpink' },
-		{ name: 'Kepri', h: defaultH, mat: 'hotpink' }
-	];
+	export let hoverIndex: number;
+
+	export let defaultH = 10;
+	export let provinces: { name: string; code: string; h: number; mat: string }[];
 
 	export let blocks: { x: number; y: number; h: number }[] = [];
 
-	let camera = { position: [120, 120, 50], look: [150, 120, 0] };
+	export let isBlur = false;
+
+	let camera = { position: [10, 120, 300], look: [100, 120, 0] };
 
 	let perimeter = [
 		{ x: 99, y: -1, lx: 204, ly: 1 },
@@ -44,6 +37,7 @@
 		const temp = [...provinces];
 		temp[index].h = 1000;
 		provinces = temp;
+		hoverIndex = index;
 		console.log(index);
 	};
 
@@ -51,6 +45,7 @@
 		const temp = [...provinces];
 		temp[index].h = defaultH;
 		provinces = temp;
+		if (hoverIndex == index) hoverIndex = -1;
 		console.log(index);
 	};
 </script>
@@ -78,7 +73,7 @@
 				on:pointerleave={() => {
 					leaveProvince(index);
 				}}
-				geometry={gltf.nodes[`${province.name}`].geometry}
+				geometry={gltf.nodes[`${province.code}`].geometry}
 				scale={352}
 				scale.y={province.h}
 			>
@@ -94,8 +89,8 @@
 
 {#each blocks as block, i}
 	{#if block.h > 0.1}
-		<T.Mesh position.x={block.x * (100 / res)} position.y={block.y * (100 / res) + 100}>
-			<T.BoxGeometry args={[80 / res, 80 / res, block.h]} />
+		<T.Mesh position.x={block.x * (200 / res)} position.y={block.y * (200 / res)}>
+			<T.BoxGeometry args={[100 / res, 100 / res, block.h]} />
 			<T.MeshStandardMaterial color="hotpink" />
 		</T.Mesh>
 	{/if}

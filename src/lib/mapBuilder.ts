@@ -1,14 +1,6 @@
-export const rebuildFromCompressed = (
-	plot: string[],
-	res: number,
-	xOffset?: number,
-	yOffset?: number
-) => {
-	let picRes = 1000;
+export const rebuildFromCompressed = (plot: string[], picRes: number) => {
 	let x: number = 0;
 	let y: number = 0;
-	// let currentToken = 'n';
-	let temp: { x: number; y: number; h: number }[] = [];
 
 	let heightData: number[][] = new Array(picRes);
 
@@ -18,7 +10,7 @@ export const rebuildFromCompressed = (
 
 	const next = () => {
 		y++;
-		if (y == 1000) {
+		if (y == picRes) {
 			y = 0;
 			x++;
 		}
@@ -60,23 +52,18 @@ export const rebuildFromCompressed = (
 
 	// console.log(heightData);
 
-	const blocks = rebuild(heightData, res, xOffset, yOffset);
+	// const blocks = rebuild(heightData, res, xOffset, yOffset);
 
-	return blocks;
+	// return blocks;
+
+	return heightData;
 };
 
-export const rebuild = (
-	heightData: number[][],
-	resolution: number,
-	xOffset?: number,
-	yOffset?: number
-) => {
+export const rebuildPlot = async (heightData: number[][], plotRes: number, resolution: number) => {
 	let currentPlot: { x: number; y: number; h: number }[] = [];
-	const rev = 1000 / resolution;
+	const rev = plotRes / resolution;
 
 	const plotToResolution = () => {
-		const xOff = xOffset ? xOffset : 0;
-		const yOff = yOffset ? yOffset : 0;
 		for (let i = 0; i < resolution; i++) {
 			for (let j = 0; j < resolution; j++) {
 				let totalElevation = 0;
@@ -100,8 +87,8 @@ export const rebuild = (
 				if (totalElevation < 0) continue;
 				// console.log(totalElevation);
 				currentPlot.push({
-					x: i + xOff,
-					y: resolution - 1 - j - yOff,
+					x: i,
+					y: resolution - 1 - j,
 					h: totalElevation / 10000
 				});
 			}
@@ -114,4 +101,28 @@ export const rebuild = (
 	const blocks = [...plot];
 	// console.log(blocks);
 	return blocks;
+};
+
+// need optimizing, rn we're copying the height data for each plot
+// also only support squares rn
+export const combinePlots = (
+	plots: { plot: string[]; xOffset: number; yOffset: number }[],
+	picRes: number
+) => {
+	let heightData: number[][] = new Array((picRes * plots.length) / 2);
+
+	for (let i = 0; i < (picRes * plots.length) / 2; i++) {
+		heightData[i] = new Array(picRes);
+	}
+
+	plots.forEach((plotObject) => {
+		const height = rebuildFromCompressed(plotObject.plot, picRes);
+		for (let i = 0; i < picRes; i++) {
+			for (let j = 0; j < picRes; j++) {
+				heightData[i + plotObject.xOffset * picRes][j + plotObject.yOffset * picRes] = height[i][j];
+			}
+		}
+	});
+
+	return heightData;
 };

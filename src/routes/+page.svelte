@@ -2,29 +2,79 @@
 	import App from '$lib/components/App.svelte';
 	import Main from './Main.svelte';
 	import { Canvas } from '@threlte/core';
-	import { rebuildFromCompressed } from '$lib/mapBuilder';
+	import { rebuildPlot, combinePlots } from '$lib/mapBuilder';
 	import '../app.css';
 	import plot1 from '../lib/components/plots/plot1.json';
 	import plot2 from '../lib/components/plots/plot2.json';
 	import plot3 from '../lib/components/plots/plot3.json';
 	import plot4 from '../lib/components/plots/plot4.json';
 
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
-	let plot: string[] = plot1;
+	let heightData: number[][];
 
 	let blocks: { x: number; y: number; h: number }[] = [];
 
 	let res: number = 100;
 
-	onMount(() => {
-		const newBlocks1 = rebuildFromCompressed(plot1, res);
-		const newBlocks2 = rebuildFromCompressed(plot2, res, res, 0);
-		const newBlocks3 = rebuildFromCompressed(plot3, res, 0, res);
-		const newBlocks4 = rebuildFromCompressed(plot4, res, res, res);
-		const newBlocks = [...newBlocks1, ...newBlocks2, ...newBlocks3, ...newBlocks4];
+	const picRes = 2000;
 
-		blocks = newBlocks;
+	const initialBuild = async () => {
+		const plots = [
+			{ plot: plot1, xOffset: 0, yOffset: 0 },
+			{ plot: plot2, xOffset: 1, yOffset: 0 },
+			{ plot: plot3, xOffset: 0, yOffset: 1 },
+			{ plot: plot4, xOffset: 1, yOffset: 1 }
+		];
+		heightData = combinePlots(plots, 1000);
+		console.log(heightData);
+		blocks = await rebuildPlot(heightData, picRes, 100);
+	};
+
+	const rebuild = async (resolution: number) => {
+		blocks = [];
+		isBlur = true;
+		console.log('blur');
+		// await tick();
+		setTimeout(() => {
+			rebuildBlocks(resolution);
+		}, 0);
+		console.log('unblur');
+	};
+
+	const rebuildBlocks = async (resolution: number) => {
+		res = resolution;
+		blocks = await rebuildPlot(heightData, picRes, res);
+		isBlur = false;
+	};
+
+	let defaultH = 10;
+	let hoverIndex = -1;
+
+	let activeProvince = ' ';
+
+	let isBlur = false;
+
+	let provinces = [
+		{ name: 'Aceh', code: 'Aceh', h: defaultH, mat: 'hotpink' },
+		{ name: 'Sumatera Utara', code: 'Medan', h: defaultH, mat: 'green' },
+		{ name: 'Sumatera Barat', code: 'Sumbar', h: defaultH, mat: 'hotpink' },
+		{ name: 'Bengkulu', code: 'Bengkulu', h: defaultH, mat: 'hotpink' },
+		{ name: 'Riau', code: 'Riau', h: defaultH, mat: 'hotpink' },
+		{ name: 'Jambi', code: 'Jambi', h: defaultH, mat: 'hotpink' },
+		{ name: 'Lampung', code: 'Lampung', h: defaultH, mat: 'blue' },
+		{ name: 'Sumatera Selatan', code: 'Sumsel', h: defaultH, mat: 'hotpink' },
+		{ name: 'Bangka Belitung', code: 'Babel', h: defaultH, mat: 'hotpink' },
+		{ name: 'Kepulauan Riau', code: 'Kepri', h: defaultH, mat: 'hotpink' }
+	];
+
+	$: {
+		if (hoverIndex == -1) activeProvince = ' ';
+		else activeProvince = provinces[hoverIndex].name;
+	}
+
+	onMount(() => {
+		initialBuild();
 	});
 </script>
 
@@ -35,8 +85,7 @@
 				<button
 					class="p-2 bg-slate-200 rounded-md w-12"
 					on:click={() => {
-						res = 50;
-						rebuildFromCompressed(plot, 50);
+						rebuild(50);
 					}}
 				>
 					50
@@ -44,8 +93,7 @@
 				<button
 					class="p-2 bg-slate-200 rounded-md w-12"
 					on:click={() => {
-						res = 100;
-						rebuildFromCompressed(plot, 100);
+						rebuild(100);
 					}}
 				>
 					100
@@ -53,8 +101,7 @@
 				<button
 					class="p-2 bg-slate-200 rounded-md w-12"
 					on:click={() => {
-						res = 200;
-						rebuildFromCompressed(plot, 200);
+						rebuild(200);
 					}}
 				>
 					200
@@ -62,8 +109,7 @@
 				<button
 					class="p-2 bg-slate-200 rounded-md w-12"
 					on:click={() => {
-						res = 500;
-						rebuildFromCompressed(plot, 500);
+						rebuild(500);
 					}}
 				>
 					500
@@ -71,17 +117,21 @@
 				<button
 					class="p-2 bg-slate-200 rounded-md w-12"
 					on:click={() => {
-						res = 1000;
-						rebuildFromCompressed(plot, 1000);
+						rebuild(1000);
 					}}
 				>
 					1000
 				</button>
 			</div>
+			<div>province: {activeProvince}</div>
+			<div class=" p-4 rounded-full hover:rounded-none bg-white" />
+			{#if isBlur}
+				<div id="blurDiv" class="p-32 bg-white">aloooooooo</div>
+			{/if}
 		</div>
 	</div>
 	<Canvas>
-		<Main {blocks} {res} />
+		<Main {blocks} {res} bind:provinces {defaultH} bind:hoverIndex bind:isBlur />
 	</Canvas>
 </div>
 
