@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Canvas } from '@threlte/core';
 	import BlocksScene from '$lib/components/BlocksScene.svelte';
-	import '../../../app.css';
+	import '../../../../app.css';
 	import { onMount } from 'svelte';
 	import triggerDownload from '$lib/download';
 	import { rebuildFromCompressed } from '$lib/mapBuilder';
