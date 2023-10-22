@@ -17,6 +17,8 @@
 
 	let res: number = 100;
 
+	let isHover = false;
+
 	const picRes = 2000;
 
 	const initialBuild = async () => {
@@ -32,14 +34,19 @@
 	};
 
 	const rebuild = async (resolution: number) => {
-		blocks = [];
 		isBlur = true;
-		console.log('blur');
-		// await tick();
+		await tick();
+		setTimeout(() => {
+			clearBlocks(resolution);
+		}, 100);
+	};
+
+	const clearBlocks = async (resolution: number) => {
+		blocks = [];
+		await tick();
 		setTimeout(() => {
 			rebuildBlocks(resolution);
-		}, 0);
-		console.log('unblur');
+		}, 100);
 	};
 
 	const rebuildBlocks = async (resolution: number) => {
@@ -48,7 +55,7 @@
 		isBlur = false;
 	};
 
-	let defaultH = 10;
+	let defaultH = 100;
 	let hoverIndex = -1;
 
 	let activeProvince = ' ';
@@ -56,16 +63,16 @@
 	let isBlur = false;
 
 	let provinces = [
-		{ name: 'Aceh', code: 'Aceh', h: defaultH, mat: 'hotpink' },
-		{ name: 'Sumatera Utara', code: 'Medan', h: defaultH, mat: 'green' },
-		{ name: 'Sumatera Barat', code: 'Sumbar', h: defaultH, mat: 'hotpink' },
-		{ name: 'Bengkulu', code: 'Bengkulu', h: defaultH, mat: 'hotpink' },
-		{ name: 'Riau', code: 'Riau', h: defaultH, mat: 'hotpink' },
-		{ name: 'Jambi', code: 'Jambi', h: defaultH, mat: 'hotpink' },
-		{ name: 'Lampung', code: 'Lampung', h: defaultH, mat: 'blue' },
-		{ name: 'Sumatera Selatan', code: 'Sumsel', h: defaultH, mat: 'hotpink' },
-		{ name: 'Bangka Belitung', code: 'Babel', h: defaultH, mat: 'hotpink' },
-		{ name: 'Kepulauan Riau', code: 'Kepri', h: defaultH, mat: 'hotpink' }
+		{ name: 'Aceh', code: 'Aceh', h: defaultH, mat: 'hotpink', x: 20, y: -20 },
+		{ name: 'Sumatera Utara', code: 'Medan', h: defaultH, mat: 'green', x: 0, y: 0 },
+		{ name: 'Sumatera Barat', code: 'Sumbar', h: defaultH, mat: 'hotpink', x: 0, y: 0 },
+		{ name: 'Bengkulu', code: 'Bengkulu', h: defaultH, mat: 'hotpink', x: 0, y: 0 },
+		{ name: 'Riau', code: 'Riau', h: defaultH, mat: 'hotpink', x: 0, y: 0 },
+		{ name: 'Jambi', code: 'Jambi', h: defaultH, mat: 'hotpink', x: 0, y: 0 },
+		{ name: 'Lampung', code: 'Lampung', h: defaultH, mat: 'blue', x: 0, y: 0 },
+		{ name: 'Sumatera Selatan', code: 'Sumsel', h: defaultH, mat: 'hotpink', x: 0, y: 0 },
+		{ name: 'Bangka Belitung', code: 'Babel', h: defaultH, mat: 'hotpink', x: 0, y: 0 },
+		{ name: 'Kepulauan Riau', code: 'Kepri', h: defaultH, mat: 'hotpink', x: 0, y: 0 }
 	];
 
 	$: {
@@ -79,8 +86,9 @@
 </script>
 
 <div class=" w-screen h-screen BG">
-	<div class="p-4 absolute">
+	<div class="p-4 absolute z-10">
 		<div class="p-2 gap-2 flex flex-col bg-neutral-500 rounded-md">
+			resolution:
 			<div class="flex gap-2">
 				<button
 					class="p-2 bg-slate-200 rounded-md w-12"
@@ -125,14 +133,19 @@
 			</div>
 			<div>province: {activeProvince}</div>
 			<div class=" p-4 rounded-full hover:rounded-none bg-white" />
-			{#if isBlur}
-				<div id="blurDiv" class="p-32 bg-white">aloooooooo</div>
-			{/if}
 		</div>
 	</div>
-	<Canvas>
-		<Main {blocks} {res} bind:provinces {defaultH} bind:hoverIndex bind:isBlur />
-	</Canvas>
+	{#if isBlur}
+		<div class="w-screen h-screen backdrop-blur-sm absolute" />
+		<div class="w-screen h-screen flex justify-center items-center absolute">
+			<div class="bg-neutral-400 rounded-md h-fit w-fit p-4 px-8">Loading...</div>
+		</div>
+	{/if}
+	<div class={`w-screen h-screen ${isHover ? 'cursor-pointer' : ''}`}>
+		<Canvas>
+			<Main {blocks} {res} bind:provinces {defaultH} bind:hoverIndex bind:isBlur bind:isHover />
+		</Canvas>
+	</div>
 </div>
 
 <style>
