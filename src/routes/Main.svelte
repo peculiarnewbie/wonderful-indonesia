@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Group, OneMinusDstAlphaFactor } from 'three';
 	import { T, forwardEventHandlers, useFrame } from '@threlte/core';
-	import { useGltf } from '@threlte/extras';
+	import { Text, useGltf } from '@threlte/extras';
 	import { interactivity, OrbitControls } from '@threlte/extras';
 	import { spring, tweened, type Spring } from 'svelte/motion';
 
@@ -16,6 +16,7 @@
 	export let res: number = 100;
 
 	export let hoverIndex: number;
+	export let activeIndex: number;
 
 	export let defaultH = 10;
 	export let provinces: {
@@ -37,9 +38,9 @@
 	let blocksH = 0;
 
 	useFrame((state, delta) => {
+		// delta value might cause error for fast computers?
 		if (blocksH < 1 && delta < 1) {
 			blocksH += delta * 0.4;
-			console.log(delta, blocksH);
 		}
 	});
 
@@ -50,15 +51,15 @@
 	let camera = { position: [-60, 50, 300], look: [40, 100, 0] };
 
 	let perimeter = [
-		{ x: 99, y: -1, lx: 204, ly: 1 },
-		{ x: -1, y: 99, lx: 1, ly: 204 },
-		{ x: 99, y: 200, lx: 200, ly: 1 },
-		{ x: 200, y: 100, lx: 1, ly: 202 }
+		{ x: 100, y: -1, lx: 202, ly: 1 },
+		{ x: -1, y: 99.5, lx: 1, ly: 202 },
+		{ x: 100, y: 200, lx: 202, ly: 1 },
+		{ x: 200.5, y: 99.5, lx: 1, ly: 202 }
 	];
 
 	const hoverProvince = (index: number) => {
 		const temp = [...provinces];
-		temp[index].h = 1000;
+		temp[index].h = 500;
 		provinces = temp;
 		hoverIndex = index;
 		isHover = true;
@@ -78,7 +79,8 @@
 		console.log(provinces[index].name);
 		scenex.set(provinces[index].x);
 		sceney.set(provinces[index].y);
-		console.log($scenex, $sceney);
+		activeIndex = index;
+		// console.log($scenex, $sceney);
 	};
 </script>
 
@@ -88,9 +90,18 @@
 
 <T.DirectionalLight position={[0, 10, 10]} />
 <T.DirectionalLight position={[10, 10, 10]} />
+<T.DirectionalLight position={[-100, -100, 10]} intensity={0.3} />
 
 <T.Group position.x={-100 + $scenex} position.y={-100 + $sceney} scale.z={blocksH}>
-	<T is={ref} dispose={false} {...$$restProps} bind:this={$component} position.z={-2}>
+	<T
+		is={ref}
+		dispose={false}
+		{...$$restProps}
+		bind:this={$component}
+		position.z={-1.5}
+		position.x={0.5}
+		position.y={0.5}
+	>
 		{#await gltf}
 			<slot name="fallback" />
 		{:then gltf}
@@ -127,12 +138,12 @@
 				position.z={block.h / 2}
 			>
 				<T.BoxGeometry args={[100 / res, 100 / res, block.h]} />
-				<T.MeshStandardMaterial color="hotpink" />
+				<T.MeshStandardMaterial color="#ef476f" />
 			</T.Mesh>
 		{/if}
 	{/each}
 
-	<T.Group scale.x={2}>
+	<T.Group scale.x={1} position.x={10}>
 		{#each perimeter as block, i}
 			<T.Mesh position.x={block.x} position.y={block.y}>
 				<T.BoxGeometry args={[block.lx, block.ly, 1]} />
@@ -140,4 +151,14 @@
 			</T.Mesh>
 		{/each}
 	</T.Group>
+	<Text text="Sumatra" color="white" fontSize="14" anchorX="50%" anchorY="100%" position.x={42} />
+	<Text
+		text="Population density of"
+		color="white"
+		fontSize="3"
+		anchorX="50%"
+		anchorY="100%"
+		position.x={30}
+		position.y={17}
+	/>
 </T.Group>
