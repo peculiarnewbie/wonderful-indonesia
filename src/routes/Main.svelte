@@ -37,7 +37,7 @@
 	let blocksH = 0;
 
 	useFrame((state, delta) => {
-		if (blocksH < 1 && delta < 0.1) {
+		if (blocksH < 1 && delta < 1) {
 			blocksH += delta * 0.4;
 			console.log(delta, blocksH);
 		}
@@ -87,6 +87,7 @@
 </T.PerspectiveCamera>
 
 <T.DirectionalLight position={[0, 10, 10]} />
+<T.DirectionalLight position={[10, 10, 10]} />
 
 <T.Group position.x={-100 + $scenex} position.y={-100 + $sceney} scale.z={blocksH}>
 	<T is={ref} dispose={false} {...$$restProps} bind:this={$component} position.z={-2}>
