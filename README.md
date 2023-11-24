@@ -1,6 +1,6 @@
 # Wonderful Indonesia
 
-a project created for threlte warp 2023 hackaton event: [Threlte Hackathon](https://threlte.xyz/hackathon).
+a project created for threlte warp 2023 hackaton event: [Threlte Hackathon](https://threlte.xyz/hackathon). (Where it won 2nd place! 🥳)
 
 I've always loved geography, data visualizations and maps that people made have always been a big part of that. It helps show the uniqueness and complexities of a given region. Hopefully this project can help aid in that
 

@@ -2,7 +2,7 @@
 	import { Group, OneMinusDstAlphaFactor } from 'three';
 	import { T, forwardEventHandlers, useFrame } from '@threlte/core';
 	import { Text, useGltf } from '@threlte/extras';
-	import { interactivity, OrbitControls } from '@threlte/extras';
+	import { interactivity, OrbitControls, InstancedMesh, Instance } from '@threlte/extras';
 	import { spring, tweened, type Spring } from 'svelte/motion';
 
 	interactivity();
@@ -130,18 +130,20 @@
 
 		<slot {ref} />
 	</T>
-	{#each blocks as block, i}
-		{#if block.h > 0.1}
-			<T.Mesh
-				position.x={block.x * (200 / res)}
-				position.y={block.y * (200 / res)}
-				position.z={block.h / 2}
-			>
-				<T.BoxGeometry args={[100 / res, 100 / res, block.h]} />
-				<T.MeshStandardMaterial color="#ef476f" />
-			</T.Mesh>
-		{/if}
-	{/each}
+	<InstancedMesh limit={1000000} range={500000}>
+		<T.BoxGeometry />
+		<T.MeshStandardMaterial color="#ef476f" />
+		{#each blocks as block, i}
+			{#if block.h > 0.1}
+				<Instance
+					position.x={block.x * (200 / res)}
+					position.y={block.y * (200 / res)}
+					position.z={block.h / 2}
+					scale={[100 / res, 100 / res, block.h]}
+				/>
+			{/if}
+		{/each}
+	</InstancedMesh>
 
 	<T.Group scale.x={1} position.x={10}>
 		{#each perimeter as block, i}
